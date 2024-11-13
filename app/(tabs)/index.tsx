@@ -1,4 +1,4 @@
-import { Text, View, FlatList, Image, Dimensions, ActivityIndicator, RefreshControl, Pressable } from "react-native";
+import { Text, View, FlatList, Image, Dimensions, ActivityIndicator, RefreshControl, Pressable, StyleSheet } from "react-native";
 import { useState, useCallback, useEffect, useRef } from "react";
 import { Novel, novelApi } from '@/lib/supabase';
 import { router } from 'expo-router';
@@ -22,7 +22,7 @@ export default function Index() {
       
       const { data } = await novelApi.getNovels({
         page: 1,
-        pageSize: 50 // 增加一次性加载的数量
+        pageSize: 50
       });
 
       setNovels(data);
@@ -32,7 +32,6 @@ export default function Index() {
     }
   };
 
-  // 首次加载
   useEffect(() => {
     if (isFirstLoad.current) {
       isFirstLoad.current = false;
@@ -49,61 +48,28 @@ export default function Index() {
   const renderNovelItem = ({ item }: { item: Novel }) => (
     <Pressable 
       onPress={() => router.push(`/novel/${item.id}`)}
-      style={({ pressed }) => ({
-        width: itemWidth,
-        marginBottom: spacing,
-        backgroundColor: 'white',
-        borderRadius: 8,
-        shadowColor: "#000",
-        shadowOffset: {
-          width: 0,
-          height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5,
-        overflow: 'hidden',
-        opacity: pressed ? 0.9 : 1,
-        transform: [{ scale: pressed ? 0.98 : 1 }]
-      })}
+      style={({ pressed }) => [
+        styles.novelCard,
+        {
+          width: itemWidth,
+          opacity: pressed ? 0.9 : 1,
+          transform: [{ scale: pressed ? 0.98 : 1 }]
+        }
+      ]}
     >
       <Image
         source={{ uri: item.cover }}
-        style={{
-          width: '100%',
-          height: 150,
-          resizeMode: 'cover'
-        }}
+        style={styles.coverImage}
       />
-      <View style={{ padding: 8 }}>
+      <View style={styles.cardContent}>
         <Text 
-          style={{ 
-            fontSize: 16, 
-            fontWeight: 'bold',
-            marginBottom: 4 
-          }}
-          numberOfLines={1}
+          style={styles.title}
+          numberOfLines={2}
         >
           {item.title}
         </Text>
-        <Text 
-          style={{ 
-            fontSize: 12, 
-            color: '#666',
-            marginBottom: 4 
-          }}
-        >
+        <Text style={styles.author}>
           Author: {item.author}
-        </Text>
-        <Text 
-          style={{ 
-            fontSize: 12, 
-            color: '#999',
-            lineHeight: 16 
-          }}
-          numberOfLines={2}
-        >
-          {item.description}
         </Text>
       </View>
     </Pressable>
@@ -112,8 +78,8 @@ export default function Index() {
   const renderError = () => {
     if (error) {
       return (
-        <View style={{ padding: 16, alignItems: 'center' }}>
-          <Text style={{ color: 'red' }}>{error}</Text>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
         </View>
       );
     }
@@ -121,21 +87,15 @@ export default function Index() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+    <View style={styles.container}>
       {renderError()}
       <FlatList
         data={novels}
         renderItem={renderNovelItem}
         keyExtractor={item => item.id}
         numColumns={2}
-        columnWrapperStyle={{
-          justifyContent: 'space-between',
-          paddingHorizontal: horizontalPadding,
-          marginTop: spacing
-        }}
-        contentContainerStyle={{
-          paddingBottom: spacing
-        }}
+        columnWrapperStyle={styles.columnWrapper}
+        contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -148,3 +108,51 @@ export default function Index() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  errorContainer: {
+    padding: 16,
+    alignItems: 'center',
+  },
+  errorText: {
+    color: 'red',
+  },
+  columnWrapper: {
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    marginTop: 12,
+  },
+  listContainer: {
+    paddingBottom: 12,
+  },
+  novelCard: {
+    marginBottom: 12,
+    backgroundColor: 'white',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#eee',
+    overflow: 'hidden',
+  },
+  coverImage: {
+    width: '100%',
+    height: 200,
+    resizeMode: 'cover',
+  },
+  cardContent: {
+    padding: 8,
+  },
+  title: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  author: {
+    fontSize: 10,
+    color: '#666',
+    marginBottom: 4,
+  },
+});

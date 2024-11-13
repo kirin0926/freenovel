@@ -15,7 +15,7 @@ export default function RootLayout() {
       headerShown: false // 隐藏所有页面的默认头部
     }}>
       <Stack.Screen 
-        name="(tabs)" 
+        name="(tabs)"
         options={{
           headerShown: false 
         }} 

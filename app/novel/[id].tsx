@@ -1,5 +1,5 @@
 import { useLocalSearchParams } from 'expo-router';
-import { View, Text, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
 import { useState, useEffect } from 'react';
 import { Novel, supabase } from '../../lib/supabase';
 
@@ -32,7 +32,7 @@ export default function NovelReader() {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' }}>
+      <View style={styles.centerContainer}>
         <ActivityIndicator size="large" color="#666" />
       </View>
     );
@@ -40,84 +40,87 @@ export default function NovelReader() {
 
   if (error) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' }}>
-        <Text style={{ color: 'red' }}>{error}</Text>
+      <View style={styles.centerContainer}>
+        <Text style={styles.errorText}>{error}</Text>
       </View>
     );
   }
 
   if (!novel) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' }}>
-        <Text>Novel not found</Text>
+      <View style={styles.centerContainer}>
+        <Text style={styles.notFoundText}>Novel not found</Text>
       </View>
     );
   }
 
   return (
-    <ScrollView 
-      style={{ flex: 1, backgroundColor: 'white' }}
-      contentContainerStyle={{ padding: 20 }}
-    >
-      {/* Novel Title */}
-      <Text style={{ 
-        fontSize: 24, 
-        fontWeight: 'bold',
-        marginBottom: 12,
-        color: '#333'
-      }}>
-        {novel.title}
-      </Text>
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+      <Text style={styles.title}>{novel.title}</Text>
+      <Text style={styles.author}>Author: {novel.author}</Text>
 
-      {/* Author Info */}
-      <Text style={{ 
-        fontSize: 16,
-        color: '#666',
-        marginBottom: 24
-      }}>
-        Author: {novel.author}
-      </Text>
-
-      {/* Novel Description */}
-      <View style={{
-        marginBottom: 32
-      }}>
-        <Text style={{
-          fontSize: 18,
-          fontWeight: 'bold',
-          marginBottom: 12,
-          color: '#333'
-        }}>
-          Description
-        </Text>
-        <Text style={{
-          fontSize: 16,
-          lineHeight: 24,
-          color: '#444'
-        }}>
-          {novel.description}
-        </Text>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Description</Text>
+        <Text style={styles.description}>{novel.description}</Text>
       </View>
 
-      {/* Novel Content */}
-      <View>
-        <Text style={{
-          fontSize: 18,
-          fontWeight: 'bold',
-          marginBottom: 12,
-          color: '#333'
-        }}>
-          Content
-        </Text>
-        <Text style={{
-          fontSize: 16,
-          lineHeight: 28,
-          color: '#333',
-          textAlign: 'justify'
-        }}>
-          {novel.content}
-        </Text>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Content</Text>
+        <Text style={styles.content}>{novel.content}</Text>
       </View>
     </ScrollView>
   );
-} 
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  contentContainer: {
+    padding: 20,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+  },
+  errorText: {
+    color: 'red',
+  },
+  notFoundText: {
+    color: '#333',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 12,
+    color: '#333',
+  },
+  author: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 24,
+  },
+  section: {
+    marginBottom: 32,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 12,
+    color: '#333',
+  },
+  description: {
+    fontSize: 16,
+    lineHeight: 24,
+    color: '#444',
+  },
+  content: {
+    fontSize: 16,
+    lineHeight: 28,
+    color: '#333',
+    textAlign: 'justify',
+  },
+}); 
