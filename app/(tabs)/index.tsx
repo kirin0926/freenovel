@@ -1,6 +1,6 @@
 import { Text, View, FlatList, Image, Dimensions, ActivityIndicator, RefreshControl, Pressable } from "react-native";
 import { useState, useCallback, useEffect, useRef } from "react";
-import { Novel, novelApi } from '../lib/supabase';
+import { Novel, novelApi } from '@/lib/supabase';
 import { router } from 'expo-router';
 
 export default function Index() {
@@ -121,7 +121,7 @@ export default function Index() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#f5f5f5' }}>
+    <View style={{ flex: 1, backgroundColor: '#fff' }}>
       {renderError()}
       <FlatList
         data={novels}
