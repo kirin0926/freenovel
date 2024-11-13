@@ -1,67 +1,55 @@
-import { Text, View, FlatList, Image, Dimensions, ActivityIndicator, RefreshControl } from "react-native";
-import { useState, useCallback, useEffect } from "react";
+import { Text, View, FlatList, Image, Dimensions, ActivityIndicator, RefreshControl, Pressable } from "react-native";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Novel, novelApi } from '../lib/supabase';
+import { router } from 'expo-router';
 
 export default function Index() {
   const [novels, setNovels] = useState<Novel[]>([]);
   const [refreshing, setRefreshing] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [hasMore, setHasMore] = useState(true);
-  const [page, setPage] = useState(1);
+  const isFirstLoad = useRef(true);
 
   // 布局常量
   const screenWidth = Dimensions.get('window').width;
-  const spacing = 12; // 卡片之间的间距
-  const horizontalPadding = 16; // 屏幕左右边距
-  const itemWidth = (screenWidth - (horizontalPadding * 2) - spacing) / 2; // 计算单个卡片宽度
+  const spacing = 12;
+  const horizontalPadding = 16;
+  const itemWidth = (screenWidth - (horizontalPadding * 2) - spacing) / 2;
 
   // 获取小说列表数据
-  const fetchNovels = async (isRefresh = false) => {
+  const fetchNovels = async () => {
     try {
       setError(null);
-      const currentPage = isRefresh ? 1 : page;
       
-      const { data, hasMore: more } = await novelApi.getNovels({
-        page: currentPage,
-        pageSize: 10
+      const { data } = await novelApi.getNovels({
+        page: 1,
+        pageSize: 50 // 增加一次性加载的数量
       });
 
-      if (isRefresh) {
-        setNovels(data);
-        setPage(1);
-      } else {
-        setNovels(prev => [...prev, ...data]);
-        setPage(currentPage + 1);
-      }
-      
-      setHasMore(more);
+      setNovels(data);
     } catch (err) {
+      console.error('Fetch error:', err);
       setError(err instanceof Error ? err.message : 'Loading failed');
     }
   };
 
   // 首次加载
   useEffect(() => {
-    fetchNovels(true);
+    if (isFirstLoad.current) {
+      isFirstLoad.current = false;
+      fetchNovels();
+    }
   }, []);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await fetchNovels(true);
+    await fetchNovels();
     setRefreshing(false);
   }, []);
 
-  const onEndReached = async () => {
-    if (loading || !hasMore) return;
-    setLoading(true);
-    await fetchNovels();
-    setLoading(false);
-  };
-
   const renderNovelItem = ({ item }: { item: Novel }) => (
-    <View 
-      style={{
+    <Pressable 
+      onPress={() => router.push(`/novel/${item.id}`)}
+      style={({ pressed }) => ({
         width: itemWidth,
         marginBottom: spacing,
         backgroundColor: 'white',
@@ -74,8 +62,10 @@ export default function Index() {
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
         elevation: 5,
-        overflow: 'hidden'
-      }}
+        overflow: 'hidden',
+        opacity: pressed ? 0.9 : 1,
+        transform: [{ scale: pressed ? 0.98 : 1 }]
+      })}
     >
       <Image
         source={{ uri: item.cover }}
@@ -103,7 +93,7 @@ export default function Index() {
             marginBottom: 4 
           }}
         >
-          {item.author}
+          Author: {item.author}
         </Text>
         <Text 
           style={{ 
@@ -116,26 +106,8 @@ export default function Index() {
           {item.description}
         </Text>
       </View>
-    </View>
+    </Pressable>
   );
-
-  const renderFooter = () => {
-    if (!hasMore) {
-      return (
-        <Text style={{ textAlign: 'center', padding: 16, color: '#666' }}>
-          There is no more data available
-        </Text>
-      );
-    }
-    if (loading) {
-      return (
-        <View style={{ padding: 16, alignItems: 'center' }}>
-          <ActivityIndicator size="small" color="#666" />
-        </View>
-      );
-    }
-    return null;
-  };
 
   const renderError = () => {
     if (error) {
@@ -172,9 +144,6 @@ export default function Index() {
             colors={['#666']}
           />
         }
-        onEndReached={onEndReached}
-        onEndReachedThreshold={0.3}
-        ListFooterComponent={renderFooter}
       />
     </View>
   );

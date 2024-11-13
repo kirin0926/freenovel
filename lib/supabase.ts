@@ -12,6 +12,7 @@ export interface Novel {
   author: string;
   cover: string;
   description: string;
+  content: string;
 }
 
 // 小说相关的数据操作
