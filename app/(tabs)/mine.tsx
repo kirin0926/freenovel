@@ -1,5 +1,6 @@
 import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import { router } from 'expo-router';
 
 interface UserInfo {
   id: string;
@@ -17,8 +18,7 @@ export default function Mine() {
   };
 
   const handleSubscribe = () => {
-    // 处理订阅逻辑
-    console.log('Subscribe clicked');
+    router.push('/membership/membership');
   };
 
   return (
@@ -49,10 +49,10 @@ export default function Mine() {
       >
         <View style={styles.subscriptionLeft}>
           <Text style={styles.subscriptionTitle}>
-            Premium Membership
+            $9.9/Month Premium Membership
           </Text>
           <Text style={styles.subscriptionDesc}>
-          Read all novels on the site without restrictions
+          Read all novels without restrictions
           </Text>
         </View>
         <View style={styles.subscriptionRight}>

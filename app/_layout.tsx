@@ -21,9 +21,25 @@ export default function RootLayout() {
         }} 
       />
       <Stack.Screen 
+        name="membership/membership" 
+        options={{
+          headerShown: true,
+          title: 'Membership',
+          headerStyle: {
+            backgroundColor: 'white',
+          },
+          headerTitleStyle: {
+            color: '#333',
+          },
+          headerTitleAlign: 'center',
+          headerTintColor: '#333',
+          headerBackTitle: 'Back',
+        }}
+      />
+      <Stack.Screen 
         name="novel/[id]" 
         options={{
-          headerShown: true, // 显示小说详情页的头部
+          headerShown: true,
           title: 'Novel Detail',
           headerStyle: {
             backgroundColor: 'white',
@@ -31,6 +47,7 @@ export default function RootLayout() {
           headerTitleStyle: {
             color: '#333',
           },
+          headerTitleAlign: 'center',
           headerTintColor: '#333',
         }}
       />

@@ -16,7 +16,10 @@ export default function TabsLayout() {
       },
       headerTitleStyle: {
         color: '#333',
-      }
+        textAlign: 'center',
+        alignSelf: 'center',
+      },
+      headerTitleAlign: 'center',
     }}>
       <Tabs.Screen
         name="index"
